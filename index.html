@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HP Tools — Feedback</title>
+<style>
+  :root {
+    --slate-900: #0f172a;
+    --slate-700: #334155;
+    --slate-500: #64748b;
+    --slate-300: #cbd5e1;
+    --slate-200: #e2e8f0;
+    --slate-100: #f1f5f9;
+    --slate-50: #f8fafc;
+    --white: #ffffff;
+    --red-500: #ef4444;
+    --green-500: #22c55e;
+    --green-50: #f0fdf4;
+    --green-700: #15803d;
+    --blue-500: #3b82f6;
+    --blue-50: #eff6ff;
+    --blue-700: #1d4ed8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--slate-50);
+    color: var(--slate-700);
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 24px 16px 40px;
+  }
+
+  header {
+    margin-bottom: 28px;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--slate-900);
+    letter-spacing: -0.3px;
+  }
+
+  header p {
+    font-size: 13px;
+    color: var(--slate-500);
+    margin-top: 4px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    background: var(--slate-100);
+    border-radius: 10px;
+    padding: 3px;
+    margin-bottom: 28px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 10px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: transparent;
+    color: var(--slate-500);
+    transition: all 0.15s;
+  }
+
+  .tab.active {
+    background: var(--white);
+    color: var(--slate-900);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  /* Section */
+  .section { margin-bottom: 28px; }
+
+  .section-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--slate-900);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .section-label span {
+    font-weight: 400;
+    color: var(--slate-500);
+  }
+
+  /* Tool chips */
+  .tool-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .tool-chip {
+    padding: 9px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--slate-200);
+    background: var(--white);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--slate-700);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+
+  .tool-chip.selected {
+    background: var(--slate-900);
+    color: var(--white);
+    border-color: var(--slate-900);
+  }
+
+  /* Issue pills */
+  .issues-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .issue-pill {
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--slate-200);
+    background: var(--white);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+    color: var(--slate-700);
+  }
+
+  .issue-pill:hover { border-color: var(--slate-300); }
+
+  .issue-pill.selected {
+    background: var(--blue-50);
+    border-color: var(--blue-500);
+    color: var(--blue-700);
+  }
+
+  .issue-count {
+    background: var(--slate-100);
+    color: var(--slate-500);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .issue-pill.selected .issue-count {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--blue-700);
+  }
+
+  .no-issues {
+    color: var(--slate-500);
+    font-size: 13px;
+    font-style: italic;
+    padding: 8px 0;
+  }
+
+  .loading-spinner {
+    color: var(--slate-500);
+    font-size: 13px;
+    padding: 8px 0;
+  }
+
+  /* New issue input */
+  .new-issue-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .new-issue-row input {
+    flex: 1;
+    padding: 9px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--slate-200);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+  }
+
+  .new-issue-row input:focus { border-color: var(--slate-300); }
+
+  .add-btn {
+    padding: 9px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--slate-900);
+    background: var(--slate-900);
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .add-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Ratings */
+  .ratings { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .rating-btn {
+    flex: 1 1 60px;
+    min-width: 72px;
+    padding: 12px 8px;
+    border-radius: 12px;
+    border: 1.5px solid var(--slate-200);
+    background: var(--white);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s;
+  }
+
+  .rating-btn .emoji { font-size: 24px; }
+  .rating-btn .label { font-size: 11px; font-weight: 500; color: var(--slate-500); }
+
+  .rating-btn.selected {
+    background: var(--slate-900);
+    border-color: var(--slate-900);
+  }
+
+  .rating-btn.selected .label { color: var(--white); }
+
+  /* Textarea */
+  .comment-wrap { position: relative; }
+
+  .comment-wrap textarea {
+    width: 100%;
+    padding: 12px 52px 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--slate-200);
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    min-height: 72px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .comment-wrap textarea:focus { border-color: var(--slate-300); }
+  .comment-wrap textarea.recording {
+    border-color: var(--red-500);
+    box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+  }
+
+  .voice-btn {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--slate-900);
+    color: var(--white);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .voice-btn.recording {
+    background: var(--red-500);
+    box-shadow: 0 0 0 4px rgba(239,68,68,0.2);
+  }
+
+  .recording-hint {
+    color: var(--red-500);
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 6px;
+  }
+
+  /* Name input */
+  .name-input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--slate-200);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+  }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    background: var(--slate-900);
+    color: var(--white);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .submit-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* Success */
+  .success {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .success .check { font-size: 48px; margin-bottom: 12px; }
+  .success h2 { font-size: 18px; color: var(--slate-900); font-weight: 600; }
+  .success p { color: var(--slate-500); font-size: 14px; margin-top: 4px; }
+
+  /* Results tab */
+  .summary-cards {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .summary-card {
+    flex: 1 1 140px;
+    background: var(--white);
+    border: 1px solid var(--slate-200);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .summary-card .tool-name { font-size: 12px; color: var(--slate-500); margin-bottom: 4px; }
+  .summary-card .avg { font-size: 22px; font-weight: 700; color: var(--slate-900); }
+  .summary-card .avg span { font-size: 12px; color: var(--slate-500); }
+  .summary-card .count { font-size: 11px; color: var(--slate-500); margin-top: 2px; }
+
+  .top-issues-section {
+    background: var(--white);
+    border: 1px solid var(--slate-200);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .top-issues-section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--slate-900);
+    margin-bottom: 12px;
+  }
+
+  .top-issue-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--slate-100);
+    font-size: 13px;
+  }
+
+  .top-issue-row:last-child { border: none; }
+  .top-issue-text { color: var(--slate-700); flex: 1; }
+
+  .top-issue-bar-wrap {
+    width: 80px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+
+  .top-issue-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--blue-500);
+  }
+
+  .top-issue-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--slate-500);
+    min-width: 16px;
+    text-align: right;
+  }
+
+  .entry-card {
+    background: var(--white);
+    border: 1px solid var(--slate-200);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+
+  .entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .entry-tool { font-weight: 600; font-size: 13px; color: var(--slate-900); }
+  .entry-date { font-size: 11px; color: var(--slate-500); }
+  .entry-meta { font-size: 12px; color: var(--slate-500); margin-bottom: 4px; }
+  .entry-issues { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+
+  .entry-issue-tag {
+    font-size: 11px;
+    background: var(--slate-100);
+    color: var(--slate-700);
+    padding: 3px 9px;
+    border-radius: 10px;
+  }
+
+  .entry-comment {
+    font-size: 13px;
+    color: var(--slate-700);
+    margin-top: 8px;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--slate-500);
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Feedback · HP Tools</h1>
+    <p>Select, vote and comment — you can also dictate by voice 🎙</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('form')">Give Feedback</button>
+    <button class="tab" onclick="switchTab('results')">Results</button>
+  </div>
+
+  <!-- FORM TAB -->
+  <div id="tab-form">
+    <div id="form-content"></div>
+  </div>
+
+  <!-- RESULTS TAB -->
+  <div id="tab-results" style="display:none">
+    <div id="results-content"></div>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// CONFIG — replace with your deployed Apps Script URL
+// =====================================================
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2kt1sMzud65jcDS6AERpQbRGTmwGtB7TOCiEpBFN59zLt3a1UOq-ttGaVxI5qEh33/exec";
+
+const TOOLS = [
+  { id: "hotel-enrichment", name: "Hotel Enrichment Tool", emoji: "🏨" },
+  { id: "flight-alerts", name: "Flight Alerts", emoji: "✈️" },
+  { id: "flight-design", name: "Flight Design (Contentful)", emoji: "🎨" }
+];
+
+const RATINGS = [
+  { value: 1, emoji: "😕", label: "Needs work" },
+  { value: 2, emoji: "😐", label: "It's okay" },
+  { value: 3, emoji: "🙂", label: "Works well" },
+  { value: 4, emoji: "😍", label: "Love it" }
+];
+
+// State
+let allData = [];
+let state = { tool: null, selectedIssues: [], rating: null, comment: "", name: "", newIssue: "", listening: false };
+let recognition = null;
+
+function sanitize(str) {
+  const el = document.createElement("div");
+  el.textContent = str;
+  return el.innerHTML;
+}
+
+// =====================================================
+// DATA
+// =====================================================
+async function fetchData() {
+  try {
+    const res = await fetch(SCRIPT_URL);
+    allData = await res.json();
+  } catch (e) {
+    console.error("Fetch error:", e);
+    allData = [];
+  }
+}
+
+function getIssuesForTool(toolId) {
+  const counts = {};
+  allData.forEach(row => {
+    if (row.tool !== toolId) return;
+    (row.issues || []).forEach(issue => {
+      const t = issue.trim();
+      if (t) counts[t] = (counts[t] || 0) + 1;
+    });
+    if (row.newIssue && row.newIssue.trim()) {
+      const t = row.newIssue.trim();
+      counts[t] = (counts[t] || 0) + 1;
+    }
+  });
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([text, count]) => ({ text, count }));
+}
+
+// =====================================================
+// VOICE
+// =====================================================
+function toggleVoice() {
+  if (state.listening) {
+    recognition?.stop();
+    state.listening = false;
+    renderForm();
+    return;
+  }
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert("Your browser doesn't support voice input. Use Chrome."); return; }
+
+  recognition = new SR();
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.continuous = true;
+
+  recognition.onresult = (e) => {
+    const text = Array.from(e.results).map(r => r[0].transcript).join(" ");
+    state.comment = state.comment ? state.comment + " " + text : text;
+    renderForm();
+  };
+
+  recognition.onerror = () => { state.listening = false; renderForm(); };
+  recognition.onend = () => { state.listening = false; renderForm(); };
+
+  recognition.start();
+  state.listening = true;
+  renderForm();
+}
+
+// =====================================================
+// SUBMIT
+// =====================================================
+async function submitFeedback() {
+  const toolName = TOOLS.find(t => t.id === state.tool)?.name || state.tool;
+  const payload = {
+    tool: state.tool,
+    issues: state.selectedIssues,
+    rating: state.rating,
+    comment: state.comment.trim(),
+    name: state.name.trim() || "Anonymous",
+    newIssue: state.newIssue.trim()
+  };
+
+  // Show success immediately
+  document.getElementById("form-content").innerHTML = `
+    <div class="success">
+      <div class="check">✓</div>
+      <h2>Feedback submitted!</h2>
+      <p>Thanks for your time</p>
+    </div>
+  `;
+
+  // Send in background
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(payload)
+    });
+    allData.push({
+      timestamp: new Date().toISOString(),
+      tool: payload.tool,
+      issues: payload.issues,
+      rating: payload.rating,
+      comment: payload.comment,
+      name: payload.name,
+      newIssue: payload.newIssue
+    });
+  } catch (e) { console.error("Submit error:", e); }
+
+  // Reset after delay
+  setTimeout(() => {
+    state = { tool: null, selectedIssues: [], rating: null, comment: "", name: "", newIssue: "", listening: false };
+    renderForm();
+  }, 2000);
+}
+
+// =====================================================
+// RENDER FORM
+// =====================================================
+function renderForm() {
+  const issues = state.tool ? getIssuesForTool(state.tool) : [];
+  const canSubmit = state.tool && (state.selectedIssues.length > 0 || state.rating || state.comment.trim() || state.newIssue.trim());
+
+  let html = `
+    <!-- Tool selector -->
+    <div class="section">
+      <label class="section-label">What tool is this about?</label>
+      <div class="tool-chips">
+        ${TOOLS.map(t => `
+          <button class="tool-chip ${state.tool === t.id ? 'selected' : ''}"
+                  onclick="selectTool('${t.id}')">
+            ${t.emoji} ${t.name}
+          </button>
+        `).join("")}
+      </div>
+    </div>
+  `;
+
+  if (state.tool) {
+    // Known issues
+    html += `
+      <div class="section">
+        <label class="section-label">What others are saying <span>— tap to agree</span></label>
+        <div class="issues-area">
+          ${issues.length ? issues.map(iss => {
+            const sel = state.selectedIssues.includes(iss.text);
+            const safe = sanitize(iss.text);
+            return `<button class="issue-pill ${sel ? 'selected' : ''}"
+                            onclick="toggleIssue('${iss.text.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}')">
+              ${safe}
+              <span class="issue-count">${iss.count}</span>
+            </button>`;
+          }).join("") : '<span class="no-issues">No feedback yet — be the first!</span>'}
+        </div>
+        <div class="new-issue-row">
+          <input type="text" placeholder="Add your own (issue, suggestion, praise…)"
+                 value="${state.newIssue.replace(/"/g, '&quot;')}"
+                 oninput="state.newIssue = this.value" />
+        </div>
+      </div>
+    `;
+
+    // Rating
+    html += `
+      <div class="section">
+        <label class="section-label">Overall rating <span>(optional)</span></label>
+        <div class="ratings">
+          ${RATINGS.map(r => `
+            <button class="rating-btn ${state.rating === r.value ? 'selected' : ''}"
+                    onclick="selectRating(${r.value})">
+              <span class="emoji">${r.emoji}</span>
+              <span class="label">${r.label}</span>
+            </button>
+          `).join("")}
+        </div>
+      </div>
+    `;
+
+    // Comment + voice
+    html += `
+      <div class="section">
+        <label class="section-label">Want to add more detail? <span>— type or tap 🎙 to dictate</span></label>
+        <div class="comment-wrap">
+          <textarea class="${state.listening ? 'recording' : ''}"
+                    placeholder="What would you improve?"
+                    oninput="state.comment = this.value">${state.comment}</textarea>
+          <button class="voice-btn ${state.listening ? 'recording' : ''}" onclick="toggleVoice()">
+            ${state.listening ? '■' : '🎙'}
+          </button>
+        </div>
+        ${state.listening ? '<p class="recording-hint">● Listening… tap ■ when done</p>' : ''}
+      </div>
+    `;
+
+    // Name
+    html += `
+      <div class="section">
+        <label class="section-label">Your name <span>(optional)</span></label>
+        <input class="name-input" type="text" placeholder="Anonymous if left empty"
+               value="${state.name.replace(/"/g, '&quot;')}"
+               oninput="state.name = this.value" />
+      </div>
+    `;
+
+    // Submit
+    html += `
+      <button class="submit-btn" ${canSubmit ? '' : 'disabled'} onclick="submitFeedback()">
+        Send feedback
+      </button>
+    `;
+  }
+
+  document.getElementById("form-content").innerHTML = html;
+}
+
+// =====================================================
+// RENDER RESULTS
+// =====================================================
+function renderResults() {
+  if (!allData.length) {
+    document.getElementById("results-content").innerHTML = '<div class="empty-state">No feedback yet</div>';
+    return;
+  }
+
+  // Summary cards
+  const byTool = {};
+  allData.forEach(row => {
+    if (!byTool[row.tool]) byTool[row.tool] = [];
+    byTool[row.tool].push(row);
+  });
+
+  let html = '<div class="summary-cards">';
+  TOOLS.forEach(t => {
+    const items = byTool[t.id] || [];
+    const rated = items.filter(i => i.rating);
+    const avg = rated.length ? (rated.reduce((s, i) => s + Number(i.rating), 0) / rated.length).toFixed(1) : "—";
+    html += `
+      <div class="summary-card">
+        <div class="tool-name">${t.emoji} ${t.name}</div>
+        <div class="avg">${avg}${rated.length ? '<span>/4</span>' : ''}</div>
+        <div class="count">${items.length} response${items.length !== 1 ? 's' : ''}</div>
+      </div>
+    `;
+  });
+  html += '</div>';
+
+  // Top issues per tool
+  TOOLS.forEach(t => {
+    const issues = getIssuesForTool(t.id);
+    if (!issues.length) return;
+    const max = issues[0].count;
+    html += `<div class="top-issues-section">
+      <h3>${t.emoji} ${t.name} — Top Feedback</h3>`;
+    issues.slice(0, 8).forEach(iss => {
+      const pct = Math.round((iss.count / max) * 100);
+      html += `<div class="top-issue-row">
+        <span class="top-issue-text">${sanitize(iss.text)}</span>
+        <div class="top-issue-bar-wrap">
+          <div class="top-issue-bar" style="width:${pct}%"></div>
+          <span class="top-issue-num">${iss.count}</span>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+
+  // Recent entries
+  const sorted = [...allData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  sorted.slice(0, 20).forEach(entry => {
+    const toolObj = TOOLS.find(t => t.id === entry.tool);
+    const ratingObj = RATINGS.find(r => r.value === Number(entry.rating));
+    const date = new Date(entry.timestamp).toLocaleDateString("en-GB", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" });
+
+    html += `<div class="entry-card">
+      <div class="entry-header">
+        <span class="entry-tool">${toolObj ? toolObj.emoji + ' ' + toolObj.name : entry.tool}</span>
+        <span class="entry-date">${date}</span>
+      </div>
+      <div class="entry-meta">${ratingObj ? ratingObj.emoji + ' ' + ratingObj.label + ' · ' : ''}${sanitize(entry.name || 'Anonymous')}</div>`;
+
+    const allIssues = [...(entry.issues || [])];
+    if (entry.newIssue?.trim()) allIssues.push(entry.newIssue.trim());
+
+    if (allIssues.length) {
+      html += '<div class="entry-issues">';
+      allIssues.forEach(i => { if (i.trim()) html += `<span class="entry-issue-tag">${sanitize(i.trim())}</span>`; });
+      html += '</div>';
+    }
+
+    if (entry.comment?.trim()) {
+      html += `<div class="entry-comment">"${sanitize(entry.comment.trim())}"</div>`;
+    }
+
+    html += '</div>';
+  });
+
+  document.getElementById("results-content").innerHTML = html;
+}
+
+// =====================================================
+// INTERACTIONS
+// =====================================================
+function selectTool(id) {
+  state.tool = id;
+  state.selectedIssues = [];
+  renderForm();
+}
+
+function toggleIssue(text) {
+  const idx = state.selectedIssues.indexOf(text);
+  if (idx >= 0) state.selectedIssues.splice(idx, 1);
+  else state.selectedIssues.push(text);
+  renderForm();
+}
+
+function selectRating(v) {
+  state.rating = state.rating === v ? null : v;
+  renderForm();
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((el, i) => {
+    el.classList.toggle('active', (tab === 'form' && i === 0) || (tab === 'results' && i === 1));
+  });
+  document.getElementById('tab-form').style.display = tab === 'form' ? 'block' : 'none';
+  document.getElementById('tab-results').style.display = tab === 'results' ? 'block' : 'none';
+  if (tab === 'results') renderResults();
+}
+
+// =====================================================
+// INIT
+// =====================================================
+(async function init() {
+  await fetchData();
+  renderForm();
+})();
+</script>
+</body>
+</html>
