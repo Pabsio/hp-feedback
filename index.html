@@ -830,8 +830,8 @@ function switchTab(tab) {
 // INIT
 // =====================================================
 (async function init() {
-  await fetchData();
   renderForm();
+  fetchData().then(() => renderForm());
 })();
 </script>
 </body>
